@@ -1,11 +1,89 @@
-import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
+import Head from 'next/head'
+import { Inter } from 'next/font/google'
+import styles from '@/styles/Home.module.css'
+import Stepper from '@/components/Stepper'
+import { type CSSProperties, useState } from 'react'
+import type { TStep } from '@/types/common'
+import { BTN_STYLE } from '@/constants/common'
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
+const calculateButtonStyle: CSSProperties = {
+  height: 24,
+  width: 24,
+  textAlign: 'center',
+  border: '1px solid white',
+  borderRadius: 24,
+}
 
 export default function Home() {
+  const [step1State, setStep1State] = useState(1)
+  const [step2State, setStep2State] = useState('')
+
+  const steps: TStep[] = [
+    {
+      id: 1,
+      name: 'Step 1',
+      render: () => (
+        <div style={{ display: 'flex', gap: 16 }}>
+          <button
+            style={{ ...BTN_STYLE, ...calculateButtonStyle }}
+            onClick={() => setStep1State((pre) => (pre = pre - 1))}
+          >
+            -
+          </button>
+          <div>{step1State}</div>
+          <button
+            style={{ ...BTN_STYLE, ...calculateButtonStyle }}
+            onClick={() => setStep1State((pre) => (pre = pre + 1))}
+          >
+            +
+          </button>
+        </div>
+      ),
+      onSubmit: () => console.log('Submitted step 1'),
+      disabledSteps: [3],
+    },
+    {
+      id: 2,
+      name: 'Step 2',
+      render: () => (
+        <div>
+          <label htmlFor="greeting">Greeting: </label>
+          <input
+            type="text"
+            id="greeting"
+            name="greeting"
+            value={step2State}
+            onChange={(ev) => setStep2State(ev.currentTarget.value)}
+          />
+        </div>
+      ),
+      onSubmit: () => console.log('Submitted step 2'),
+      validator: () => {
+        if (step2State.length > 1) return true
+
+        alert('Greeting must be 2 or more characters')
+        return false
+      },
+    },
+    {
+      id: 3,
+      name: 'Step 3',
+      render: () => (
+        <div>
+          <h1>Review</h1>
+          <br />
+          <h2>Step 1</h2>
+          <p>{step1State}</p>
+          <br />
+          <h2>Step 2</h2>
+          <p>{step2State}</p>
+        </div>
+      ),
+      onSubmit: () => console.log('Submitted step 3'),
+    },
+  ]
+
   return (
     <>
       <Head>
@@ -14,101 +92,10 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <main className={`${styles.main} ${inter.className}`}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{" "}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        <Stepper steps={steps} />
       </main>
     </>
-  );
+  )
 }
